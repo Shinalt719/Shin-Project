@@ -32,11 +32,13 @@ const tracks = [
 const MusicPlayerSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(70);
   const [activeTrack, setActiveTrack] = useState(tracks[0]);
   const [activeCategory, setActiveCategory] = useState('Study');
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const progressRef = useRef<HTMLDivElement | null>(null);
   
   const sectionRef = useAnimatedElement<HTMLDivElement>();
   const contentRef = useAnimatedElement<HTMLDivElement>();
@@ -56,6 +58,23 @@ const MusicPlayerSection = () => {
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (progressRef.current && audioRef.current) {
+      const rect = progressRef.current.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      const newTime = pos * duration;
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
     }
   };
 
@@ -127,6 +146,7 @@ const MusicPlayerSection = () => {
                 ref={audioRef}
                 src={activeTrack.audioUrl} 
                 onTimeUpdate={handleTimeUpdate}
+                onLoadedMetadata={handleLoadedMetadata}
                 onEnded={() => setIsPlaying(false)}
               />
               
@@ -162,13 +182,19 @@ const MusicPlayerSection = () => {
               <div className="mb-6">
                 <div className="flex justify-between text-sm text-gray-500 mb-1">
                   <span>{formatTime(currentTime)}</span>
-                  <span>{activeTrack.duration}</span>
+                  <span>{formatTime(duration)}</span>
                 </div>
-                <div className="h-2 bg-gray-200 rounded-full">
+                <div 
+                  ref={progressRef}
+                  className="h-2 bg-gray-200 rounded-full cursor-pointer"
+                  onClick={handleProgressClick}
+                >
                   <div 
-                    className="h-full bg-gradient-to-r from-indigo-600 to-blue-500 rounded-full"
-                    style={{ width: `${(currentTime / (parseInt(activeTrack.duration.split(':')[0]) * 60 + parseInt(activeTrack.duration.split(':')[1]))) * 100}%` }}
-                  ></div>
+                    className="h-full bg-gradient-to-r from-indigo-600 to-blue-500 rounded-full relative"
+                    style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
+                  >
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md"></div>
+                  </div>
                 </div>
               </div>
               
