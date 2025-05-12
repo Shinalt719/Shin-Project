@@ -5,29 +5,29 @@ import { useAnimatedElement } from '../hooks/useAnimatedElement';
 const tracks = [
   { 
     id: 1, 
-    title: 'Deep Focus', 
-    duration: '3:45', 
-    category: 'Study', 
+    title: 'Gentle Rain', 
+    duration: '5:30', 
+    category: 'Ambient', 
     imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=600' 
   },
   { 
     id: 2, 
-    title: 'Ambient Flow', 
-    duration: '4:20', 
-    category: 'Relaxation', 
+    title: 'Forest Rain', 
+    duration: '4:45', 
+    category: 'Nature', 
     imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600' 
   },
   { 
     id: 3, 
-    title: 'Zen Study', 
-    duration: '5:15', 
-    category: 'Study', 
+    title: 'Rain Meditation', 
+    duration: '6:15', 
+    category: 'Relaxation', 
     imageUrl: 'https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg?auto=compress&cs=tinysrgb&w=600' 
   },
 ];
 
-// Study music track from pixabay (royalty-free)
-const AUDIO_URL = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3";
+// Soothing rain ambient sound from pixabay (royalty-free)
+const AUDIO_URL = "https://cdn.pixabay.com/download/audio/2022/03/10/audio_1fb4aa5b4d.mp3?filename=rain-and-thunder-16705.mp3";
 
 const MusicPlayerSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
