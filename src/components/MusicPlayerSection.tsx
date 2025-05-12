@@ -8,26 +8,18 @@ const tracks = [
     title: 'Deep Focus', 
     duration: '3:45', 
     category: 'Study', 
-    imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=600' 
+    imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=600',
+    audioUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3"
   },
   { 
     id: 2, 
-    title: 'Ambient Flow', 
-    duration: '4:20', 
-    category: 'Relaxation', 
-    imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600' 
-  },
-  { 
-    id: 3, 
-    title: 'Zen Study', 
-    duration: '5:15', 
-    category: 'Study', 
-    imageUrl: 'https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg?auto=compress&cs=tinysrgb&w=600' 
-  },
+    title: 'Rain Focus', 
+    duration: '3:45', 
+    category: 'Ambient', 
+    imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600',
+    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3"
+  }
 ];
-
-// Study music track from pixabay (royalty-free)
-const AUDIO_URL = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3";
 
 const MusicPlayerSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -60,12 +52,10 @@ const MusicPlayerSection = () => {
 
   const changeTrack = (track: typeof tracks[0]) => {
     setActiveTrack(track);
+    setIsPlaying(false);
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
-      if (isPlaying) {
-        audioRef.current.play();
-      }
     }
   };
 
@@ -125,7 +115,7 @@ const MusicPlayerSection = () => {
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <audio 
                 ref={audioRef}
-                src={AUDIO_URL} 
+                src={activeTrack.audioUrl} 
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => setIsPlaying(false)}
               />
