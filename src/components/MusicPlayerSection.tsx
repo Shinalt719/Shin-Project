@@ -9,7 +9,7 @@ const tracks = [
     duration: '5:30', 
     category: 'Ambient', 
     imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=600',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/10/30/audio_347289a634.mp3?filename=rain-ambient-114354.mp3'
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/10/30/audio_347289a634.mp3'
   },
   { 
     id: 2, 
@@ -17,7 +17,7 @@ const tracks = [
     duration: '4:45', 
     category: 'Nature', 
     imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0fd6a9优.mp3?filename=light-rain-ambient-114591.mp3'
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0fd6a9d1c.mp3'
   },
   { 
     id: 3, 
@@ -25,7 +25,7 @@ const tracks = [
     duration: '6:15', 
     category: 'Relaxation', 
     imageUrl: 'https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg?auto=compress&cs=tinysrgb&w=600',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/04/27/audio_2a1fec8f02.mp3?filename=rain-and-thunder-nature-sounds-8163.mp3'
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/04/27/audio_2a1fec8f02.mp3'
   },
 ];
 
@@ -34,6 +34,7 @@ const MusicPlayerSection = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(70);
   const [activeTrack, setActiveTrack] = useState(tracks[0]);
+  const [error, setError] = useState<string | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -43,11 +44,14 @@ const MusicPlayerSection = () => {
 
   const togglePlay = () => {
     if (audioRef.current) {
+      setError(null);
       if (isPlaying) {
         audioRef.current.pause();
       } else {
         audioRef.current.play().catch(error => {
           console.error("Error playing audio:", error);
+          setError("Unable to play audio. Please try again.");
+          setIsPlaying(false);
         });
       }
       setIsPlaying(!isPlaying);
@@ -63,6 +67,7 @@ const MusicPlayerSection = () => {
   const changeTrack = (track: typeof tracks[0]) => {
     setActiveTrack(track);
     setIsPlaying(false);
+    setError(null);
     if (audioRef.current) {
       audioRef.current.src = track.audioUrl;
       audioRef.current.currentTime = 0;
@@ -70,6 +75,7 @@ const MusicPlayerSection = () => {
       if (isPlaying) {
         audioRef.current.play().catch(error => {
           console.error("Error playing audio:", error);
+          setError("Unable to play audio. Please try again.");
         });
       }
     }
@@ -134,6 +140,10 @@ const MusicPlayerSection = () => {
                 src={activeTrack.audioUrl}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => setIsPlaying(false)}
+                onError={() => {
+                  setError("Error loading audio. Please try another track.");
+                  setIsPlaying(false);
+                }}
               />
               
               <div className="relative mb-8">
@@ -148,6 +158,12 @@ const MusicPlayerSection = () => {
                   <h4 className="text-2xl font-bold">{activeTrack.title}</h4>
                 </div>
               </div>
+              
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
               
               <div className="mb-6">
                 <div className="flex justify-between text-sm text-gray-500 mb-1">
