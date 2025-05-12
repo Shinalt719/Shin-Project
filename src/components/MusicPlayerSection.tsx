@@ -8,26 +8,26 @@ const tracks = [
     title: 'Gentle Rain', 
     duration: '5:30', 
     category: 'Ambient', 
-    imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=600' 
+    imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=600',
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/10/30/audio_347289a634.mp3?filename=rain-ambient-114354.mp3'
   },
   { 
     id: 2, 
     title: 'Forest Rain', 
     duration: '4:45', 
     category: 'Nature', 
-    imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600' 
+    imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600',
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0fd6a9优.mp3?filename=light-rain-ambient-114591.mp3'
   },
   { 
     id: 3, 
     title: 'Rain Meditation', 
     duration: '6:15', 
     category: 'Relaxation', 
-    imageUrl: 'https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg?auto=compress&cs=tinysrgb&w=600' 
+    imageUrl: 'https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg?auto=compress&cs=tinysrgb&w=600',
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/04/27/audio_2a1fec8f02.mp3?filename=rain-and-thunder-nature-sounds-8163.mp3'
   },
 ];
-
-// Soothing rain ambient sound from pixabay (royalty-free)
-const AUDIO_URL = "https://cdn.pixabay.com/download/audio/2022/03/10/audio_1fb4aa5b4d.mp3?filename=rain-and-thunder-16705.mp3";
 
 const MusicPlayerSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -46,7 +46,9 @@ const MusicPlayerSection = () => {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play();
+        audioRef.current.play().catch(error => {
+          console.error("Error playing audio:", error);
+        });
       }
       setIsPlaying(!isPlaying);
     }
@@ -60,11 +62,15 @@ const MusicPlayerSection = () => {
 
   const changeTrack = (track: typeof tracks[0]) => {
     setActiveTrack(track);
+    setIsPlaying(false);
     if (audioRef.current) {
+      audioRef.current.src = track.audioUrl;
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
       if (isPlaying) {
-        audioRef.current.play();
+        audioRef.current.play().catch(error => {
+          console.error("Error playing audio:", error);
+        });
       }
     }
   };
@@ -125,7 +131,7 @@ const MusicPlayerSection = () => {
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <audio 
                 ref={audioRef}
-                src={AUDIO_URL} 
+                src={activeTrack.audioUrl}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => setIsPlaying(false)}
               />
@@ -157,7 +163,14 @@ const MusicPlayerSection = () => {
               </div>
               
               <div className="flex justify-center items-center gap-6 mb-8">
-                <button className="text-gray-400 hover:text-gray-800 transition-colors">
+                <button 
+                  className="text-gray-400 hover:text-gray-800 transition-colors"
+                  onClick={() => {
+                    const currentIndex = tracks.findIndex(t => t.id === activeTrack.id);
+                    const prevTrack = tracks[currentIndex - 1] || tracks[tracks.length - 1];
+                    changeTrack(prevTrack);
+                  }}
+                >
                   <SkipBack size={24} />
                 </button>
                 <button
@@ -166,7 +179,14 @@ const MusicPlayerSection = () => {
                 >
                   {isPlaying ? <Pause size={24} /> : <Play size={24} />}
                 </button>
-                <button className="text-gray-400 hover:text-gray-800 transition-colors">
+                <button 
+                  className="text-gray-400 hover:text-gray-800 transition-colors"
+                  onClick={() => {
+                    const currentIndex = tracks.findIndex(t => t.id === activeTrack.id);
+                    const nextTrack = tracks[currentIndex + 1] || tracks[0];
+                    changeTrack(nextTrack);
+                  }}
+                >
                   <SkipForward size={24} />
                 </button>
               </div>
