@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle, Circle, Clock, Flag } from 'lucide-react';
+import { CheckCircle, Circle, Clock, Flag, Pencil, Trash2 } from 'lucide-react';
 import { useAnimatedElement } from '../hooks/useAnimatedElement';
 
 interface Task {
@@ -17,6 +17,13 @@ const TaskManagerSection = () => {
     { id: 3, title: 'Prepare English Presentation', completed: false, priority: 'medium', dueDate: 'Aug 15' },
     { id: 4, title: 'Research for History Project', completed: false, priority: 'low', dueDate: 'Aug 20' },
   ]);
+
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    priority: 'medium' as 'low' | 'medium' | 'high',
+    dueDate: ''
+  });
   
   const sectionRef = useAnimatedElement<HTMLDivElement>();
   const contentRef = useAnimatedElement<HTMLDivElement>();
@@ -26,6 +33,35 @@ const TaskManagerSection = () => {
     setTasks(tasks.map(task => 
       task.id === id ? { ...task, completed: !task.completed } : task
     ));
+  };
+
+  const deleteTask = (id: number) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  const startEditing = (task: Task) => {
+    setEditingTask(task);
+  };
+
+  const saveEdit = (id: number, newTitle: string, newPriority: 'low' | 'medium' | 'high', newDueDate: string) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, title: newTitle, priority: newPriority, dueDate: newDueDate } : task
+    ));
+    setEditingTask(null);
+  };
+
+  const addNewTask = () => {
+    if (newTask.title.trim()) {
+      const newId = Math.max(...tasks.map(t => t.id), 0) + 1;
+      setTasks([...tasks, {
+        id: newId,
+        title: newTask.title,
+        completed: false,
+        priority: newTask.priority,
+        dueDate: newTask.dueDate || 'Not set'
+      }]);
+      setNewTask({ title: '', priority: 'medium', dueDate: '' });
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -65,42 +101,120 @@ const TaskManagerSection = () => {
                     }`}
                     style={{ transitionDelay: `${index * 100}ms` }}
                   >
-                    <div className="flex items-start">
-                      <button
-                        onClick={() => toggleTask(task.id)}
-                        className="mt-0.5 mr-3 flex-shrink-0"
-                      >
-                        {task.completed ? (
-                          <CheckCircle size={20} className="text-green-500" />
-                        ) : (
-                          <Circle size={20} className="text-gray-300" />
-                        )}
-                      </button>
-                      <div className="flex-1">
-                        <p className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
-                          {task.title}
-                        </p>
-                        <div className="flex items-center mt-2 text-sm">
-                          <div className={`flex items-center mr-4 ${getPriorityColor(task.priority)}`}>
-                            <Flag size={14} className="mr-1" />
-                            <span className="capitalize">{task.priority}</span>
-                          </div>
-                          <div className="flex items-center text-gray-500">
-                            <Clock size={14} className="mr-1" />
-                            <span>{task.dueDate}</span>
-                          </div>
+                    {editingTask?.id === task.id ? (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={editingTask.title}
+                          onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
+                          className="w-full p-2 border rounded"
+                        />
+                        <div className="flex gap-2">
+                          <select
+                            value={editingTask.priority}
+                            onChange={(e) => setEditingTask({ ...editingTask, priority: e.target.value as 'low' | 'medium' | 'high' })}
+                            className="p-2 border rounded"
+                          >
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                          </select>
+                          <input
+                            type="text"
+                            value={editingTask.dueDate}
+                            onChange={(e) => setEditingTask({ ...editingTask, dueDate: e.target.value })}
+                            className="p-2 border rounded"
+                            placeholder="Due date"
+                          />
+                          <button
+                            onClick={() => saveEdit(task.id, editingTask.title, editingTask.priority, editingTask.dueDate)}
+                            className="px-3 py-1 bg-green-500 text-white rounded"
+                          >
+                            Save
+                          </button>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start flex-1">
+                          <button
+                            onClick={() => toggleTask(task.id)}
+                            className="mt-0.5 mr-3 flex-shrink-0"
+                          >
+                            {task.completed ? (
+                              <CheckCircle size={20} className="text-green-500" />
+                            ) : (
+                              <Circle size={20} className="text-gray-300" />
+                            )}
+                          </button>
+                          <div className="flex-1">
+                            <p className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+                              {task.title}
+                            </p>
+                            <div className="flex items-center mt-2 text-sm">
+                              <div className={`flex items-center mr-4 ${getPriorityColor(task.priority)}`}>
+                                <Flag size={14} className="mr-1" />
+                                <span className="capitalize">{task.priority}</span>
+                              </div>
+                              <div className="flex items-center text-gray-500">
+                                <Clock size={14} className="mr-1" />
+                                <span>{task.dueDate}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => startEditing(task)}
+                            className="p-1 text-gray-400 hover:text-indigo-600"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            onClick={() => deleteTask(task.id)}
+                            className="p-1 text-gray-400 hover:text-red-600"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
 
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="flex items-center">
-                  <div className="w-full border border-dashed border-gray-300 rounded-lg p-3 text-gray-500 flex items-center hover:border-indigo-300 hover:text-indigo-600 cursor-pointer transition-colors">
-                    <span className="text-2xl mr-2">+</span>
-                    <span>Add new task</span>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                    placeholder="Enter new task"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <div className="flex gap-2">
+                    <select
+                      value={newTask.priority}
+                      onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as 'low' | 'medium' | 'high' })}
+                      className="p-2 border rounded-lg"
+                    >
+                      <option value="low">Low Priority</option>
+                      <option value="medium">Medium Priority</option>
+                      <option value="high">High Priority</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={newTask.dueDate}
+                      onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                      placeholder="Due date"
+                      className="p-2 border rounded-lg flex-1"
+                    />
+                    <button
+                      onClick={addNewTask}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                      Add Task
+                    </button>
                   </div>
                 </div>
               </div>

@@ -9,6 +9,14 @@ const Hero = () => {
   const buttonRef = useAnimatedElement<HTMLDivElement>();
   const imageRef = useAnimatedElement<HTMLDivElement>();
 
+  const handleGetStarted = () => {
+    // Scroll to task manager section
+    const taskSection = document.getElementById('tasks');
+    if (taskSection) {
+      taskSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="pt-32 pb-20 md:pt-40 md:pb-32 relative overflow-hidden" id="home">
       {/* Gradient Orbs */}
@@ -36,9 +44,9 @@ const Hero = () => {
               ref={buttonRef}
               className="fade-in stagger-2 flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
             >
-              <a href="#get-started" className="btn btn-primary">
+              <button onClick={handleGetStarted} className="btn btn-primary">
                 Get Started Free
-              </a>
+              </button>
               <a href="#features" className="btn bg-white border border-gray-200 hover:bg-gray-50 text-gray-700">
                 <Play size={16} className="mr-2 text-indigo-600" /> Watch Demo
               </a>
