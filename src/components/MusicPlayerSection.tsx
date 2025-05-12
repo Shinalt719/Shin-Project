@@ -69,7 +69,7 @@ const MusicPlayerSection = () => {
     setIsPlaying(false);
     setError(null);
     if (audioRef.current) {
-      audioRef.current.src = track.audioUrl;
+      audioRef.current.load(); // Add this to properly reload the audio source
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
       if (isPlaying) {
@@ -137,14 +137,17 @@ const MusicPlayerSection = () => {
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <audio 
                 ref={audioRef}
-                src={activeTrack.audioUrl}
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => setIsPlaying(false)}
                 onError={() => {
                   setError("Error loading audio. Please try another track.");
                   setIsPlaying(false);
                 }}
-              />
+                preload="auto"
+              >
+                <source src={activeTrack.audioUrl} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
               
               <div className="relative mb-8">
                 <img 
