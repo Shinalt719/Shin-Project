@@ -24,10 +24,22 @@ const TaskManagerSection = () => {
     priority: 'medium' as 'low' | 'medium' | 'high',
     dueDate: ''
   });
+  const [activeTab, setActiveTab] = useState('all');
   
   const sectionRef = useAnimatedElement<HTMLDivElement>();
   const contentRef = useAnimatedElement<HTMLDivElement>();
   const tasksRef = useAnimatedElement<HTMLDivElement>();
+
+  const filteredTasks = tasks.filter(task => {
+    switch (activeTab) {
+      case 'today':
+        return task.dueDate.toLowerCase() === 'today';
+      case 'upcoming':
+        return task.dueDate.toLowerCase() !== 'today';
+      default:
+        return true;
+    }
+  });
 
   const toggleTask = (id: number) => {
     setTasks(tasks.map(task => 
@@ -86,14 +98,41 @@ const TaskManagerSection = () => {
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-2xl font-semibold">My Tasks</h3>
                 <div className="flex">
-                  <button className="px-3 py-1 rounded-l-lg bg-indigo-600 text-white text-sm">All</button>
-                  <button className="px-3 py-1 bg-gray-100 text-gray-700 text-sm">Today</button>
-                  <button className="px-3 py-1 rounded-r-lg bg-gray-100 text-gray-700 text-sm">Upcoming</button>
+                  <button 
+                    onClick={() => setActiveTab('all')}
+                    className={`px-3 py-1 ${
+                      activeTab === 'all' 
+                        ? 'bg-indigo-600 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    } rounded-l-lg transition-colors`}
+                  >
+                    All
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('today')}
+                    className={`px-3 py-1 ${
+                      activeTab === 'today' 
+                        ? 'bg-indigo-600 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Today
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab('upcoming')}
+                    className={`px-3 py-1 ${
+                      activeTab === 'upcoming' 
+                        ? 'bg-indigo-600 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    } rounded-r-lg`}
+                  >
+                    Upcoming
+                  </button>
                 </div>
               </div>
 
               <div className="space-y-3">
-                {tasks.map((task, index) => (
+                {filteredTasks.map((task, index) => (
                   <div
                     key={task.id}
                     className={`p-4 border rounded-xl transition-all duration-300 ${

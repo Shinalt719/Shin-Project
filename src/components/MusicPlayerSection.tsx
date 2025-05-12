@@ -18,6 +18,14 @@ const tracks = [
     category: 'Ambient', 
     imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600',
     audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3"
+  },
+  {
+    id: 3,
+    title: 'Tranquil Slumber',
+    duration: '5:20',
+    category: 'Sleep',
+    imageUrl: 'https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750',
+    audioUrl: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_1b2ffb3f6e.mp3?filename=sleep-music-115658.mp3"
   }
 ];
 
@@ -26,6 +34,7 @@ const MusicPlayerSection = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(70);
   const [activeTrack, setActiveTrack] = useState(tracks[0]);
+  const [activeCategory, setActiveCategory] = useState('Study');
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -57,6 +66,7 @@ const MusicPlayerSection = () => {
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
     }
+    setActiveCategory(track.category);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,14 +90,14 @@ const MusicPlayerSection = () => {
           <div ref={contentRef} className="fade-in">
             <h2 className="mb-4">Enhance Focus with <span className="gradient-text">Study Music</span></h2>
             <p className="text-xl text-gray-600 mb-6">
-              Access curated playlists designed to boost concentration, block distractions, and put your mind in the perfect study state.
+              Access curated playlists designed to boost concentration, block distractions, and put your mind in the perfect state.
             </p>
             <ul className="space-y-4 mb-8">
               <li className="flex items-start">
                 <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-1 mr-3">
                   <span className="text-green-600 font-bold text-sm">✓</span>
                 </div>
-                <p className="text-gray-700">Curated playlists for different study needs</p>
+                <p className="text-gray-700">Curated playlists for different needs</p>
               </li>
               <li className="flex items-start">
                 <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-1 mr-3">
@@ -105,7 +115,7 @@ const MusicPlayerSection = () => {
                 <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mt-1 mr-3">
                   <span className="text-green-600 font-bold text-sm">✓</span>
                 </div>
-                <p className="text-gray-700">Offline playback for uninterrupted studying</p>
+                <p className="text-gray-700">Offline playback for uninterrupted sessions</p>
               </li>
             </ul>
             <a href="#get-started" className="btn btn-primary">Try Focus Music</a>
@@ -119,6 +129,22 @@ const MusicPlayerSection = () => {
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => setIsPlaying(false)}
               />
+              
+              <div className="flex space-x-2 mb-6">
+                {['Study', 'Ambient', 'Sleep'].map(category => (
+                  <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      activeCategory === category
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
               
               <div className="relative mb-8">
                 <img 
@@ -176,7 +202,9 @@ const MusicPlayerSection = () => {
               <div className="mt-8 border-t border-gray-100 pt-6">
                 <h4 className="text-gray-700 font-medium mb-4">Recommended Tracks</h4>
                 <div className="space-y-3">
-                  {tracks.map(track => (
+                  {tracks
+                    .filter(track => track.category === activeCategory)
+                    .map(track => (
                     <div 
                       key={track.id}
                       onClick={() => changeTrack(track)}
