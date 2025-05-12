@@ -14,10 +14,10 @@ const tracks = [
   { 
     id: 2, 
     title: 'Rain Focus', 
-    duration: '3:45', 
+    duration: '2:30', 
     category: 'Ambient', 
-    imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600',
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3"
+    imageUrl: 'https://images.pexels.com/photos/7002973/pexels-photo-7002973.jpeg?auto=compress&cs=tinysrgb&w=600',
+    audioUrl: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_2f0c1e0f3e.mp3"
   }
 ];
 
