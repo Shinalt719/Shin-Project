@@ -5,36 +5,35 @@ import { useAnimatedElement } from '../hooks/useAnimatedElement';
 const tracks = [
   { 
     id: 1, 
-    title: 'Gentle Rain', 
-    duration: '5:30', 
-    category: 'Ambient', 
-    imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=600',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/10/30/audio_347289a634.mp3'
+    title: 'Deep Focus', 
+    duration: '3:45', 
+    category: 'Study', 
+    imageUrl: 'https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=600' 
   },
   { 
     id: 2, 
-    title: 'Forest Rain', 
-    duration: '4:45', 
-    category: 'Nature', 
-    imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0fd6a9d1c.mp3'
+    title: 'Ambient Flow', 
+    duration: '4:20', 
+    category: 'Relaxation', 
+    imageUrl: 'https://images.pexels.com/photos/3944104/pexels-photo-3944104.jpeg?auto=compress&cs=tinysrgb&w=600' 
   },
   { 
     id: 3, 
-    title: 'Rain Meditation', 
-    duration: '6:15', 
-    category: 'Relaxation', 
-    imageUrl: 'https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg?auto=compress&cs=tinysrgb&w=600',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/04/27/audio_2a1fec8f02.mp3'
+    title: 'Zen Study', 
+    duration: '5:15', 
+    category: 'Study', 
+    imageUrl: 'https://images.pexels.com/photos/1626481/pexels-photo-1626481.jpeg?auto=compress&cs=tinysrgb&w=600' 
   },
 ];
+
+// Study music track from pixabay (royalty-free)
+const AUDIO_URL = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3";
 
 const MusicPlayerSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(70);
   const [activeTrack, setActiveTrack] = useState(tracks[0]);
-  const [error, setError] = useState<string | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -44,15 +43,10 @@ const MusicPlayerSection = () => {
 
   const togglePlay = () => {
     if (audioRef.current) {
-      setError(null);
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play().catch(error => {
-          console.error("Error playing audio:", error);
-          setError("Unable to play audio. Please try again.");
-          setIsPlaying(false);
-        });
+        audioRef.current.play();
       }
       setIsPlaying(!isPlaying);
     }
@@ -66,17 +60,11 @@ const MusicPlayerSection = () => {
 
   const changeTrack = (track: typeof tracks[0]) => {
     setActiveTrack(track);
-    setIsPlaying(false);
-    setError(null);
     if (audioRef.current) {
-      audioRef.current.load(); // Add this to properly reload the audio source
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
       if (isPlaying) {
-        audioRef.current.play().catch(error => {
-          console.error("Error playing audio:", error);
-          setError("Unable to play audio. Please try again.");
-        });
+        audioRef.current.play();
       }
     }
   };
@@ -137,17 +125,10 @@ const MusicPlayerSection = () => {
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <audio 
                 ref={audioRef}
+                src={AUDIO_URL} 
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={() => setIsPlaying(false)}
-                onError={() => {
-                  setError("Error loading audio. Please try another track.");
-                  setIsPlaying(false);
-                }}
-                preload="auto"
-              >
-                <source src={activeTrack.audioUrl} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
+              />
               
               <div className="relative mb-8">
                 <img 
@@ -161,12 +142,6 @@ const MusicPlayerSection = () => {
                   <h4 className="text-2xl font-bold">{activeTrack.title}</h4>
                 </div>
               </div>
-              
-              {error && (
-                <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
-                  {error}
-                </div>
-              )}
               
               <div className="mb-6">
                 <div className="flex justify-between text-sm text-gray-500 mb-1">
@@ -182,14 +157,7 @@ const MusicPlayerSection = () => {
               </div>
               
               <div className="flex justify-center items-center gap-6 mb-8">
-                <button 
-                  className="text-gray-400 hover:text-gray-800 transition-colors"
-                  onClick={() => {
-                    const currentIndex = tracks.findIndex(t => t.id === activeTrack.id);
-                    const prevTrack = tracks[currentIndex - 1] || tracks[tracks.length - 1];
-                    changeTrack(prevTrack);
-                  }}
-                >
+                <button className="text-gray-400 hover:text-gray-800 transition-colors">
                   <SkipBack size={24} />
                 </button>
                 <button
@@ -198,14 +166,7 @@ const MusicPlayerSection = () => {
                 >
                   {isPlaying ? <Pause size={24} /> : <Play size={24} />}
                 </button>
-                <button 
-                  className="text-gray-400 hover:text-gray-800 transition-colors"
-                  onClick={() => {
-                    const currentIndex = tracks.findIndex(t => t.id === activeTrack.id);
-                    const nextTrack = tracks[currentIndex + 1] || tracks[0];
-                    changeTrack(nextTrack);
-                  }}
-                >
+                <button className="text-gray-400 hover:text-gray-800 transition-colors">
                   <SkipForward size={24} />
                 </button>
               </div>
