@@ -165,6 +165,12 @@ const MusicPlayerSection = () => {
                   </button>
                 ))}
               </div>
+
+              {activeCategory === 'Sleep' && (
+                <p className="text-gray-600 italic mb-6">
+                  Drift into deep rest with calming melodies designed to ease your mind and body
+                </p>
+              )}
               
               <div className="relative mb-8">
                 <img 
